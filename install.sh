@@ -423,7 +423,7 @@ function set_mirror() {
   local down_url="https://${conf["mirror_domain"]}/debian/dists/bookworm/main/installer-${conf["arch"]}/current/images/netboot/debian-installer/${conf["arch"]}"
 
   wget -O /root/initrd.gz "${down_url}/initrd.gz" || error_exit "下载 initrd.gz 失败，请重试或更换镜像源"
-  wget -O "${conf["mirror_dir"]}"/inux "${down_url}/linux" || error_exit "下载 linux 失败，请重试或更换镜像源"
+  wget -O "${conf["mirror_dir"]}"/linux "${down_url}/linux" || error_exit "下载 linux 失败，请重试或更换镜像源"
 }
 
 function gen_root_pass() {
