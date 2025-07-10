@@ -174,18 +174,6 @@ function gen_boot_conf() {
   # 获取分区 UUID
   conf["grub_uuid"]=$(blkid -p -s UUID ${boot_partition} | cut -d'"' -f2)
 
-  # 获取磁盘 by-path
-  by_path=$(ls -l /dev/disk/by-path/ | sed -nE "s/.* (virtio-pci[^ ]+) -> \S*${conf["boot_device"]}$/\1/p" | head -n 1)
-  if [ -e "/dev/disk/by-path/$by_path" ]; then
-    conf["by_path"]="/dev/disk/by-path/${by_path}"
-  else
-    by_path=$(ls -l /dev/disk/by-path/ | sed -nE "s/.* (pci-[^ ]+) -> \S*${conf["boot_device"]}$/\1/p" | head -n 1)
-    if [ ! -e "/dev/disk/by-path/$by_path" ]; then
-      error_exit "无法找到 /dev/disk/by-path/$by_path，可能是虚拟化环境下的设备名不匹配。"
-    fi
-    conf["by_path"]="/dev/disk/by-path/${by_path}"
-  fi
-
   # 检查 /boot 是否被单独挂载
   if grep -q " /boot " /proc/mounts; then
     # /boot 是单独挂载的分区
@@ -334,9 +322,6 @@ d-i mirror/http/proxy string
 
 # 特别情况，如果你的机器有多个磁盘，并系统盘不是第一顺位盘则可以指定
 
-# by-path
-#d-i partman-auto/disk string ${conf["by_path"]}
-
 # /dev/xxx
 #d-i partman-auto/disk string /dev/${conf["boot_device"]}
 
@@ -361,7 +346,7 @@ popularity-contest popularity-contest/participate boolean false
 # 安装GRUB引导加载程序
 d-i grub-installer/only_debian boolean true
 d-i grub-installer/with_other_os boolean true
-d-i grub-installer/bootdev string ${conf["by_path"]}
+d-i grub-installer/bootdev string default
 
 # 安装完成后执行命令
 d-i preseed/late_command string \
